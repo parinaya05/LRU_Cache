@@ -38,7 +38,3 @@ This concept is widely used in:
 - `get(key)` → Returns value if present, else -1
 - `put(key, value)` → Inserts or updates value
 - Automatic eviction when capacity is exceeded
-
----
-
-## 📂 Project Structure
