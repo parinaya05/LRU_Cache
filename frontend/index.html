@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LRU Cache Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>LRU Cache Visualizer</h1>
+
+<div class="container">
+
+    <!-- Capacity -->
+    <div class="card">
+        <h2>Set Capacity</h2>
+        <input type="number" id="capacity" placeholder="Enter capacity">
+        <button onclick="setCapacity()">Set</button>
+    </div>
+
+    <!-- Put -->
+    <div class="card">
+        <h2>Put (Key, Value)</h2>
+        <input type="text" id="putKey" placeholder="Key">
+        <input type="text" id="putValue" placeholder="Value">
+        <button onclick="putValue()">Put</button>
+    </div>
+
+    <!-- Get -->
+    <div class="card">
+        <h2>Get (Key)</h2>
+        <input type="text" id="getKey" placeholder="Key">
+        <button onclick="getValue()">Get</button>
+        <p id="getResult"></p>
+    </div>
+
+</div>
+
+<!-- Cache Visualization -->
+<div class="cache-container">
+    <h2>Cache Order (MRU → LRU)</h2>
+    <div id="cache"></div>
+</div>
+
+<script>
+const API = "http://localhost:3000"; // change if needed
+
+function renderCache(cache) {
+    const cacheDiv = document.getElementById("cache");
+    cacheDiv.innerHTML = "";
+
+    cache.forEach(item => {
+        const box = document.createElement("div");
+        box.className = "cache-box";
+        box.innerHTML = `<strong>${item.key}</strong><br>${item.value}`;
+        cacheDiv.appendChild(box);
+    });
+}
+
+function setCapacity() {
+    const capacity = document.getElementById("capacity").value;
+
+    fetch(`${API}/set-capacity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ capacity })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+}
+
+function putValue() {
+    const key = document.getElementById("putKey").value;
+    const value = document.getElementById("putValue").value;
+
+    fetch(`${API}/put`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value })
+    })
+    .then(res => res.json())
+    .then(data => renderCache(data.cache));
+}
+
+function getValue() {
+    const key = document.getElementById("getKey").value;
+
+    fetch(`${API}/get/${key}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("getResult").innerText =
+                data.value === -1 ? "Cache MISS ❌" : `Value: ${data.value}`;
+            renderCache(data.cache);
+        });
+}
+</script>
+
+</body>
+</html>
